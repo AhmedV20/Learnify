@@ -1,0 +1,68 @@
+using Asp.Versioning;
+using Learnify.Application.Carts.Commands;
+using Learnify.Application.Carts.DTOs.Request;
+using Learnify.Application.Carts.DTOs.Response;
+using Learnify.Application.Carts.Queries;
+using Learnify.Domain.Entities;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Security.Claims;
+using System.Threading.Tasks;
+
+namespace Learnify.Api.Controllers
+{
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [ApiController]
+    [ApiVersion("1.0")]
+    [Authorize]
+
+    public class CartsController(IMediator _mediator) : ControllerBase
+    {
+
+        private string GetCurrentUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+
+        [HttpGet]
+        public async Task<ActionResult<CartResponse>> GetMyCart()
+        {
+            var userId = GetCurrentUserId();
+            var query = new GetCartByUserIdQuery(userId);
+            var cart = await _mediator.Send(query);
+            return Ok(cart);
+        }
+
+        [HttpPost("items")]
+        public async Task<ActionResult<Cart>> AddItemToMyCart([FromBody] AddItemToCartRequest request)
+        {
+            var userId = GetCurrentUserId();
+            var command = new AddItemToCartCommand(userId, request.CourseId);
+            var cart = await _mediator.Send(command);
+            return Ok(cart);
+        }
+
+        [HttpDelete("items/{courseId:int}")]
+        public async Task<ActionResult<Cart>> RemoveItemFromMyCart(int courseId)
+        {
+            var userId = GetCurrentUserId();
+            var command = new RemoveItemFromCartCommand(userId, courseId);
+            var cart = await _mediator.Send(command);
+            return Ok(cart);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteMyCart()
+        {
+            var userId = GetCurrentUserId();
+            var command = new DeleteCartCommand(userId);
+            var result = await _mediator.Send(command);
+            if (result)
+                return Ok();
+            else
+                return NotFound();
+        }
+
+    }
+}

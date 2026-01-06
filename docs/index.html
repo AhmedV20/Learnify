@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learnify API - Production-Ready E-Learning Backend</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #34d399;
+            --accent: #8b5cf6;
+            --accent-dark: #7c3aed;
+            --bg-dark: #0f172a;
+            --bg-card: rgba(255, 255, 255, 0.05);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-animation::before,
+        .bg-animation::after {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.3;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .bg-animation::before {
+            background: var(--primary);
+            top: -200px;
+            left: -200px;
+        }
+
+        .bg-animation::after {
+            background: var(--accent);
+            bottom: -200px;
+            right: -200px;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            25% {
+                transform: translate(50px, 50px) scale(1.1);
+            }
+
+            50% {
+                transform: translate(0, 100px) scale(1);
+            }
+
+            75% {
+                transform: translate(-50px, 50px) scale(0.9);
+            }
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 16px 32px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        header div {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 20px;
+        }
+
+        .logo img {
+            height: 36px;
+            filter: brightness(0) invert(1);
+        }
+
+        .logo span {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-light);
+        }
+
+        .github-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .github-btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .github-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        /* Main content */
+        main {
+            position: relative;
+            z-index: 1;
+            padding-top: 100px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+
+        /* Hero section */
+        .hero {
+            text-align: center;
+            padding: 80px 0 60px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            font-size: 14px;
+            color: var(--primary-light);
+            margin-bottom: 24px;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .badge::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(1.2);
+            }
+        }
+
+        .hero h1 {
+            font-size: clamp(48px, 8vw, 80px);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            animation: fadeInUp 0.6s ease-out 0.1s both;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.6s ease-out 0.3s both;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 8px 30px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-outline {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        /* Tech badges */
+        .tech-section {
+            padding: 40px 0;
+        }
+
+        .tech-badges {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            animation: fadeInUp 0.6s ease-out 0.4s both;
+        }
+
+        .tech-badge {
+            padding: 10px 20px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+        }
+
+        .tech-badge:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        /* Section title */
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-title h2 {
+            font-size: 36px;
+            margin-bottom: 16px;
+        }
+
+        .section-title p {
+            color: var(--text-secondary);
+            font-size: 18px;
+        }
+
+        /* Features grid */
+        .features {
+            padding: 80px 0;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 32px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.1);
+        }
+
+        .feature-card .icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .feature-card ul {
+            list-style: none;
+        }
+
+        .feature-card li {
+            padding: 8px 0;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+        }
+
+        .feature-card li::before {
+            content: '→';
+            color: var(--primary);
+        }
+
+        /* Architecture section */
+        .architecture {
+            padding: 80px 0;
+        }
+
+        .arch-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+        }
+
+        .arch-card pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 24px;
+            border-radius: 12px;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .arch-card code {
+            color: var(--primary-light);
+        }
+
+        /* Coming Soon section */
+        .coming-soon {
+            padding: 80px 0;
+        }
+
+        .coming-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 32px;
+        }
+
+        .coming-card {
+            position: relative;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(16, 185, 129, 0.1));
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 48px 40px;
+            text-align: center;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .coming-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .coming-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+        }
+
+        .coming-card .icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            margin: 0 auto 24px;
+            animation: bounceIn 0.6s ease-out;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .coming-card h3 {
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        .coming-card p {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .coming-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 14px;
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 40px rgba(139, 92, 246, 0.5);
+            }
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 32px;
+            text-align: center;
+            border-top: 1px solid var(--glass-border);
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        footer p {
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        footer a {
+            color: var(--primary-light);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        footer a:hover {
+            color: var(--primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header {
+                padding: 12px 20px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero {
+                padding: 60px 0 40px;
+            }
+
+            .hero h1 {
+                font-size: 40px;
+            }
+
+            .coming-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-animation"></div>
+
+    <header>
+        <div>
+            <a class="logo" href="#">
+                <img src="https://res.cloudinary.com/dvfhan4lw/image/upload/v1766931549/Logo_ahzjcq.png" alt="Learnify">
+            </a>
+            <nav class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#architecture">Architecture</a>
+                <a href="#roadmap">Roadmap</a>
+                <a href="https://github.com/AhmedV20/Learnify" target="_blank" class="github-btn">
+                    <svg viewBox="0 0 16 16">
+                        <path
+                            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+                    </svg>
+                    GitHub
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero container">
+            <div class="badge">🚀 Production Ready Backend</div>
+            <h1>Learnify <span>API</span></h1>
+            <p>A production-ready .NET 9 backend for e-learning platforms. Built with Clean Architecture, CQRS, and
+                enterprise-grade features.</p>
+            <div class="hero-buttons">
+                <a href="https://github.com/AhmedV20/Learnify" class="btn btn-primary">
+                    <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                        <path
+                            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+                    </svg>
+                    View on GitHub
+                </a>
+                <a href="#architecture" class="btn btn-outline">📐 Architecture</a>
+                <a href="ARCHITECTURE.md" class="btn btn-outline">📚 Documentation</a>
+            </div>
+        </section>
+
+        <section class="tech-section container">
+            <div class="tech-badges">
+                <span class="tech-badge">.NET 9</span>
+                <span class="tech-badge">ASP.NET Core</span>
+                <span class="tech-badge">Entity Framework</span>
+                <span class="tech-badge">SQL Server</span>
+                <span class="tech-badge">Redis</span>
+                <span class="tech-badge">MediatR</span>
+                <span class="tech-badge">Hangfire</span>
+                <span class="tech-badge">Serilog</span>
+                <span class="tech-badge">Stripe</span>
+                <span class="tech-badge">Cloudinary</span>
+            </div>
+        </section>
+
+        <section class="features container" id="features">
+            <div class="section-title">
+                <h2>✨ Features</h2>
+                <p>Enterprise-grade capabilities out of the box</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="icon">🎓</div>
+                    <h3>Learning Management</h3>
+                    <ul>
+                        <li>Course creation with sections & lectures</li>
+                        <li>Video streaming via Cloudinary</li>
+                        <li>Progress tracking & certificates</li>
+                        <li>Ratings & reviews system</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🔐</div>
+                    <h3>Authentication & Security</h3>
+                    <ul>
+                        <li>JWT with refresh tokens</li>
+                        <li>Two-factor authentication</li>
+                        <li>OTP email verification</li>
+                        <li>Google OAuth integration</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">💳</div>
+                    <h3>Payment System</h3>
+                    <ul>
+                        <li>Stripe integration</li>
+                        <li>Manual payment workflows</li>
+                        <li>Admin review & approval</li>
+                        <li>Instructor payouts</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">⚡</div>
+                    <h3>Enterprise Features</h3>
+                    <ul>
+                        <li>Serilog structured logging</li>
+                        <li>Hangfire background jobs</li>
+                        <li>Scalar API documentation</li>
+                        <li>Health check endpoints</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="architecture container" id="architecture">
+            <div class="section-title">
+                <h2>📐 Clean Architecture</h2>
+                <p>Modular, testable, and maintainable codebase</p>
+            </div>
+            <div class="arch-card">
+                <pre>
+src/
+├── <code>Learnify.Api/</code>              # Presentation Layer
+│   ├── Controllers/             # 25 REST API endpoints
+│   ├── Middleware/              # Exception handling, logging
+│   ├── Health/                  # Health check implementations
+│   └── RateLimiting/            # Rate limit policies
+
+├── <code>Learnify.Application/</code>     # Business Logic Layer
+│   ├── Commands/                # Create, Update, Delete
+│   ├── Queries/                 # Read operations (CQRS)
+│   ├── DTOs/                    # Data transfer objects
+│   └── Validators/              # FluentValidation rules
+
+├── <code>Learnify.Infrastructure/</code>  # External Concerns
+│   ├── Data/                    # EF Core, Migrations
+│   ├── Services/                # Stripe, Cloudinary, Email
+│   └── BackgroundJobs/          # Hangfire implementations
+
+└── <code>Learnify.Domain/</code>          # Core Domain
+    ├── Entities/                # 23 domain models
+    └── Enums/                   # Domain enumerations
+                </pre>
+            </div>
+        </section>
+
+        <section class="coming-soon container" id="roadmap">
+            <div class="section-title">
+                <h2>🚧 Coming Soon</h2>
+                <p>Exciting new components in active development</p>
+            </div>
+            <div class="coming-grid">
+                <div class="coming-card">
+                    <div class="icon">🖥️</div>
+                    <h3>Blazor Web Application</h3>
+                    <p>A modern, interactive web frontend built with Blazor WebAssembly. Server-side rendering with
+                        real-time updates.</p>
+                    <div class="coming-badge">
+                        <span>🔨</span> In Development
+                    </div>
+                </div>
+                <div class="coming-card">
+                    <div class="icon">📊</div>
+                    <h3>Admin Dashboard</h3>
+                    <p>Comprehensive admin panel for platform management, analytics, user moderation, and payment
+                        oversight.</p>
+                    <div class="coming-badge">
+                        <span>🔨</span> In Development
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Built with ❤️ by <a href="https://github.com/AhmedV20">Ahmed</a></p>
+        <p>© 2026 Learnify. All rights reserved.</p>
+    </footer>
+</body>
+
+</html>

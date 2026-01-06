@@ -1,0 +1,11 @@
+@Learnify.Api_HostAddress = https://localhost:5279
+
+POST {{Learnify.Api_HostAddress}}/api/users/login
+Content-Type: application/json
+
+{
+  "email": "admin@Learnify.com",
+  "password": "Admin@123"
+}
+
+###
