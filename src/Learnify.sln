@@ -11,8 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Learnify.Application", "Lea
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Learnify.Infrastructure", "Learnify.Infrastructure\Learnify.Infrastructure.csproj", "{D741A1CC-5DEC-45E3-BB21-CAD92102CCA5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Learnify.Web", "Learnify.Web\Learnify.Web.csproj", "{2B52C7ED-D0F0-4B1B-8CFD-4CDA9936ABDD}"
-EndProject
+# Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Learnify.Web", "Learnify.Web\Learnify.Web.csproj", "{2B52C7ED-D0F0-4B1B-8CFD-4CDA9936ABDD}"
+# EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
